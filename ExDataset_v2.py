@@ -42,7 +42,7 @@ def plot_3d_pose(ax, pose):
     return artists
 
 
-loaded_data = np.load('/home/adam/Downloads/mm-fit/w00/w00_pose_3d.npy')
+loaded_data = np.load('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w02/w02_pose_3d.npy')
 
 fig = plt.figure(figsize=(8,8))
 ax = fig.add_subplot(111,projection='3d')
@@ -62,8 +62,8 @@ for frame in range(f):
 
 def animate(i):
     ax.clear()
-    ax.set_xlim((-500, 500))
-    ax.set_ylim((-500, 500))
+    ax.set_xlim((-1000, 1000))
+    ax.set_ylim((-1000, 1000))
     ax.set_zlim((-500, 1500))
     for line in ims[i]:
         ax.add_line(line)
