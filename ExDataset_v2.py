@@ -41,18 +41,27 @@ def plot_3d_pose(ax, pose):
         
     return artists
 
+workout_num = '00'
+exercise = 'squats'
 
-loaded_data = np.load('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w02/w02_pose_3d.npy')
+loaded_data = np.load('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w' + workout_num + '/w' + workout_num + '_pose_3d.npy')
+labels = pd.read_csv('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w' + workout_num + '/w' + workout_num + '_labels.csv', header=None)
+
+exercise_labels = labels[labels[3] == exercise]
+frames_offset = labels[0][0]
+start_frame = exercise_labels[0][exercise_labels.index[0]] - frames_offset
+end_frame = exercise_labels[1][exercise_labels.index[-1]] - frames_offset
+end_frame = start_frame + 1800
 
 fig = plt.figure(figsize=(8,8))
 ax = fig.add_subplot(111,projection='3d')
-f= loaded_data.shape[1] - 60000
-ims =[]
+#f= loaded_data.shape[1] - 60000
+# ims =[]
 
-for frame in range(f):
-    data = loaded_data[:,frame,1:]
-    sf = plot_3d_pose(ax, pose=data)
-    ims.append(sf)
+# for frame in range(start_frame, end_frame):
+#     data = loaded_data[:,frame,1:]
+#     sf = plot_3d_pose(ax, pose=data)
+#     ims.append(sf)
     
 #skel_3d = loaded_data[:, 5, :]
 #skel_3d.shape
@@ -60,26 +69,23 @@ for frame in range(f):
 #data = loaded_data[:,frame,:]
 #plot_3d_pose(ax, pose=loaded_data[:,1,1:])
 
-def animate(i):
+def animate(frame):
     ax.clear()
     ax.set_xlim((-1000, 1000))
     ax.set_ylim((-1000, 1000))
     ax.set_zlim((-500, 1500))
-    for line in ims[i]:
-        ax.add_line(line)
-        img=line
-    return ims[i]
+    data = loaded_data[:, start_frame + frame, 1:]
+    artists = plot_3d_pose(ax, pose=data)
+    return artists
 
-anim= FuncAnimation(fig, animate, frames=f, interval=10)
+f = end_frame - start_frame
+anim = FuncAnimation(fig, animate, frames=f, interval=100/3, blit=True)
 
-#Writer = writers['ffmpeg']
-#writer = Writer(fps=10, metadata=dict(artist='Me'), bitrate=1800)
-#anim.save('3d_animation.mp4', writer=writer)
+# anim= FuncAnimation(fig, animate, frames=f, interval=10)
 
-a = animate(10)
+# Writer = writers['ffmpeg']
+# writer = Writer(fps=30, metadata=dict(artist='Me'), bitrate=1800)
+# anim.save('/mnt/c/Users/Artur/Videos/3d_animation.mp4', writer=writer)
+
+#a = animate(10)
 plt.show()
-
-
-
-
-
