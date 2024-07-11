@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation, writers    
@@ -41,10 +42,28 @@ def plot_3d_pose(ax, pose):
         
     return artists
 
-workout_num = '00'
-exercise = 'squats'
+def average_neighbors(arr, window_size=5):
+    """
+    Funkcja przeprowadza uśrednianie sąsiadujących wierszy dla każdej warstwy w tablicy.
+    
+    :param arr: Tablica ndarray o wymiarach (3, N, 18)
+    :param window_size: Liczba sąsiadujących wierszy do uśrednienia (domyślnie 5)
+    :return: Nowa tablica ndarray z uśrednionymi wartościami
+    """
+    num_layers, num_rows, num_columns = arr.shape
+    averaged_array = np.zeros((num_layers, num_rows - window_size + 1, num_columns))
+    kernel = math.floor(window_size/2)
 
-loaded_data = np.load('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w' + workout_num + '/w' + workout_num + '_pose_3d.npy')
+    for layer in range(num_layers):
+        for i in range(kernel, num_rows - kernel):
+            averaged_array[layer, i - kernel] = np.mean(arr[layer, i - kernel:i + kernel + 1], axis=0)
+    
+    return averaged_array
+
+workout_num = '00'
+exercise = 'jumping_jacks'
+
+loaded_data_noise = np.load('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w' + workout_num + '/w' + workout_num + '_pose_3d.npy')
 labels = pd.read_csv('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w' + workout_num + '/w' + workout_num + '_labels.csv', header=None)
 
 exercise_labels = labels[labels[3] == exercise]
@@ -52,6 +71,9 @@ frames_offset = labels[0][0]
 start_frame = exercise_labels[0][exercise_labels.index[0]] - frames_offset
 end_frame = exercise_labels[1][exercise_labels.index[-1]] - frames_offset
 end_frame = start_frame + 1800
+
+loaded_data = average_neighbors(loaded_data_noise, 3)
+# loaded_data = loaded_data_noise
 
 fig = plt.figure(figsize=(8,8))
 ax = fig.add_subplot(111,projection='3d')
@@ -74,6 +96,7 @@ def animate(frame):
     ax.set_xlim((-1000, 1000))
     ax.set_ylim((-1000, 1000))
     ax.set_zlim((-500, 1500))
+    ax.set_box_aspect([2000, 2000, 2000])
     data = loaded_data[:, start_frame + frame, 1:]
     artists = plot_3d_pose(ax, pose=data)
     return artists
