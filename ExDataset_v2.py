@@ -61,7 +61,7 @@ def average_neighbors(arr, window_size=5):
     return averaged_array
 
 workout_num = '00'
-exercise = 'jumping_jacks'
+exercise = 'dumbbell_rows'
 
 loaded_data_noise = np.load('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w' + workout_num + '/w' + workout_num + '_pose_3d.npy')
 labels = pd.read_csv('/mnt/c/Users/Artur/Documents/Github/mm-fit/mm-fit/w' + workout_num + '/w' + workout_num + '_labels.csv', header=None)
@@ -72,7 +72,7 @@ start_frame = exercise_labels[0][exercise_labels.index[0]] - frames_offset
 end_frame = exercise_labels[1][exercise_labels.index[-1]] - frames_offset
 end_frame = start_frame + 1800
 
-loaded_data = average_neighbors(loaded_data_noise, 3)
+loaded_data = average_neighbors(loaded_data_noise, 0)
 # loaded_data = loaded_data_noise
 
 fig = plt.figure(figsize=(8,8))
